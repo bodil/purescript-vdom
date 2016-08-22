@@ -1,0 +1,33 @@
+{
+  "name": "purescript-vdom",
+  "version": "0.0.0",
+  "license": "LGPL-3.0+",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bodil/purescript-vdom.git"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^1.0.1",
+    "purescript-dom": "^2.0.1",
+    "purescript-eff": "^1.0.0",
+    "purescript-maybe": "^1.0.0",
+    "purescript-maps": "^1.1.0",
+    "purescript-foldable-traversable": "^1.0.0",
+    "purescript-tuples": "^1.0.0",
+    "purescript-strings": "^1.1.0",
+    "purescript-foreign": "^1.1.0",
+    "purescript-arrays": "^1.1.0",
+    "purescript-either": "^1.0.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^1.0.0",
+    "purescript-signal": "^7.0.0",
+    "purescript-console": "^1.0.0"
+  }
+}

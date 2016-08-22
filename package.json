@@ -1,0 +1,12 @@
+{
+  "name": "purescript-vdom",
+  "scripts": {
+    "start": "webpack-dev-server --progress --inline --config ./webpack.config.js"
+  },
+  "devDependencies": {
+    "purs-loader": "^2.0.0-rc.1",
+    "source-map-loader": "^0.1.5",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.14.1"
+  }
+}
