@@ -137,28 +137,28 @@ updateProps api target old new =
 -- |         go next (Tuple _ prev) = Tuple prev next
 -- |         patchDOM (Tuple prev next) = patch api target prev next
 patch :: ∀ e l v. DOM e l v → l → Maybe (VNode e l v) → Maybe (VNode e l v) → Eff e Unit
-patch api target old new = run target old new 0
+patch api target old new = patchIndexed target old new 0
   where
-    run :: l → Maybe (VNode e l v) → Maybe (VNode e l v) → Int → Eff e Unit
+    patchIndexed :: l → Maybe (VNode e l v) → Maybe (VNode e l v) → Int → Eff e Unit
 
-    run _ Nothing Nothing _ = pure unit
+    patchIndexed _ Nothing Nothing _ = pure unit
 
-    run parent Nothing (Just new) _ = do
+    patchIndexed parent Nothing (Just new) _ = do
       el ← createElement api new
       api.appendChild el parent
 
-    run parent (Just _) Nothing index = do
+    patchIndexed parent (Just _) Nothing index = do
       child ← api.childAt index parent
       case child of
         Just n → api.removeChild n parent
         Nothing → pure unit
 
-    run parent (Just (Text old)) (Just (Text new)) index =
+    patchIndexed parent (Just (Text old)) (Just (Text new)) index =
       when (old /= new) do
         me ← api.childAt index parent
         maybe (pure unit) (\t → api.setTextContent new t) me
 
-    run parent (Just old) (Just new) index = do
+    patchIndexed parent (Just old) (Just new) index = do
       me' ← api.childAt index parent
       case me' of
         Nothing → pure unit
@@ -171,63 +171,10 @@ patch api target old new = run target old new 0
               Element {props: oldProps}, Element {props: newProps} →
                 updateProps api me oldProps newProps
               _, _ → pure unit
-            walk me old new
+            walkChildren me old new
 
-    walk :: l → VNode e l v → VNode e l v → Eff e Unit
-    walk target (Element old) (Element new) = do
+    walkChildren :: l → VNode e l v → VNode e l v → Eff e Unit
+    walkChildren target (Element old) (Element new) = do
       let r = 0 .. ((max (length old.children) (length new.children)) - 1)
-      sequence_ $ map (\i → run target (old.children !! i) (new.children !! i) i) r
-    walk _ _ _ = pure unit
-
-
-
--- -- TODO: these could be more efficient.
--- hookPre :: ∀ a e. Array (Hook e a) → Eff e Unit
--- hookPre = filterMap run >>> sequence_
---   where run (Pre eff) = Just eff
---         run _ = Nothing
-
--- hookInit :: ∀ a e. VNode e a → Array (Hook e a) → Eff e Unit
--- hookInit node = filterMap run >>> sequence_
---   where run (Init f) = Just (f node)
---         run _ = Nothing
-
--- hookCreate :: ∀ a e. VNode e a → VNode e a → Array (Hook e a) → Eff e Unit
--- hookCreate n1 n2 = filterMap run >>> sequence_
---   where run (Create f) = Just (f n1 n2)
---         run _ = Nothing
-
--- hookInsert :: ∀ a e. VNode e a → Array (Hook e a) → Eff e Unit
--- hookInsert node = filterMap run >>> sequence_
---   where run (Insert f) = Just (f node)
---         run _ = Nothing
-
--- hookPrepatch :: ∀ a e. VNode e a → VNode e a → Array (Hook e a) → Eff e Unit
--- hookPrepatch n1 n2 = filterMap run >>> sequence_
---   where run (Prepatch f) = Just (f n1 n2)
---         run _ = Nothing
-
--- hookUpdate :: ∀ a e. VNode e a → VNode e a → Array (Hook e a) → Eff e Unit
--- hookUpdate n1 n2 = filterMap run >>> sequence_
---   where run (Update f) = Just (f n1 n2)
---         run _ = Nothing
-
--- hookPostpatch :: ∀ a e. VNode e a → VNode e a → Array (Hook e a) → Eff e Unit
--- hookPostpatch n1 n2 = filterMap run >>> sequence_
---   where run (Postpatch f) = Just (f n1 n2)
---         run _ = Nothing
-
--- hookDestroy :: ∀ a e. VNode e a → Array (Hook e a) → Eff e Unit
--- hookDestroy node = filterMap run >>> sequence_
---   where run (Destroy f) = Just (f node)
---         run _ = Nothing
-
--- hookRemove :: ∀ a e. VNode e a → Eff e Unit → Array (Hook e a) → Eff e Unit
--- hookRemove node eff = filterMap run >>> sequence_
---   where run (Remove f) = Just (f node eff)
---         run _ = Nothing
-
--- hookPost :: ∀ a e. Array (Hook e a) → Eff e Unit
--- hookPost = filterMap run >>> sequence_
---   where run (Post eff) = Just eff
---         run _ = Nothing
+      sequence_ $ map (\i → patchIndexed target (old.children !! i) (new.children !! i) i) r
+    walkChildren _ _ _ = pure unit
