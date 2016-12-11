@@ -175,6 +175,14 @@ patch api target old new = patchIndexed target old new 0
 
     walkChildren :: l → VNode e l v → VNode e l v → Eff e Unit
     walkChildren target (Element old) (Element new) = do
-      let r = 0 .. ((max (length old.children) (length new.children)) - 1)
-      sequence_ $ map (\i → patchIndexed target (old.children !! i) (new.children !! i) i) r
+        if (oldLength > newLength)
+          then do
+            walkIndexes (0 .. (newLength - 1)) -- walk up to last child of new
+            walkIndexes ((oldLength - 1) .. newLength) -- delete children backwards from end
+          else do
+            walkIndexes (0 .. (newLength - 1))
+      where
+        walkIndexes = sequence_ <<< map (\i → patchIndexed target (old.children !! i) (new.children !! i) i)
+        oldLength = length old.children
+        newLength = length new.children
     walkChildren _ _ _ = pure unit
