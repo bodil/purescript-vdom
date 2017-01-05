@@ -137,7 +137,7 @@ updateProps api target old new =
 -- |         go next (Tuple _ prev) = Tuple prev next
 -- |         patchDOM (Tuple prev next) = patch api target prev next
 patch :: ∀ e l v. DOM e l v → l → Maybe (VNode e l v) → Maybe (VNode e l v) → Eff e Unit
-patch api target old new = patchIndexed target old new 0
+patch api target' old' new' = patchIndexed target' old' new' 0
   where
     patchIndexed :: l → Maybe (VNode e l v) → Maybe (VNode e l v) → Int → Eff e Unit
 
