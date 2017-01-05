@@ -1,0 +1,19 @@
+{
+    "name": "purescript-vdom",
+    "set": "psc-0.10.4",
+    "source": "https://github.com/purescript/package-sets.git",
+    "depends": [
+        "refs",
+        "either",
+        "arrays",
+        "foreign",
+        "strings",
+        "tuples",
+        "foldable-traversable",
+        "maps",
+        "maybe",
+        "eff",
+        "dom",
+        "prelude"
+    ]
+}
