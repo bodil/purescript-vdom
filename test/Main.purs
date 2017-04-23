@@ -8,10 +8,9 @@ import DOM (DOM)
 import DOM.HTML (window)
 import DOM.HTML.Types (htmlDocumentToParentNode)
 import DOM.HTML.Window (document)
-import DOM.Node.ParentNode (querySelector)
+import DOM.Node.ParentNode (QuerySelector(..), querySelector)
 import DOM.Node.Types (elementToNode, Node)
 import Data.Maybe (Maybe(Just, Nothing), maybe)
-import Data.Nullable (toMaybe)
 import Data.Tuple (Tuple(Tuple))
 import Data.Tuple.Nested ((/\))
 import Data.VirtualDOM (patch, VNode, text, prop, h, with, EventListener(On))
@@ -56,7 +55,7 @@ app stateS actions target = do
 main :: ∀ e. Eff (console :: CONSOLE, dom :: DOM, channel :: CHANNEL, timer :: TIMER | e) Unit
 main = do
   doc ← window >>= document >>= htmlDocumentToParentNode >>> pure
-  target ← querySelector "#content" doc >>= toMaybe >>> map elementToNode >>> pure
+  target ← querySelector (QuerySelector "#content") doc >>= map elementToNode >>> pure
   actions ← channel Noop
   let state = foldp update initialState $ subscribe actions
   maybe (log "No div#content found!") (app state actions) target
