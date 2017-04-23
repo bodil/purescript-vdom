@@ -16,7 +16,6 @@ import DOM.Event.Types (Event, EventTarget, EventType(EventType))
 import DOM.HTML.Types (htmlDocumentToDocument)
 import DOM.Node.Types (Element, Document, textToNode, elementToNode, Node)
 import Data.Maybe (Maybe(Just))
-import Data.Nullable (toMaybe, toNullable)
 import Unsafe.Coerce (unsafeCoerce)
 
 document :: ∀ e. Eff (dom :: DOM | e) Document
@@ -26,7 +25,7 @@ createElement :: ∀ e. String → Eff (dom :: DOM | e) Node
 createElement name = document >>= Doc.createElement name >>= elementToNode >>> pure
 
 createElementNS :: ∀ e. String → String → Eff (dom :: DOM | e) Node
-createElementNS ns name = document >>= Doc.createElementNS (toNullable $ Just ns) name >>= elementToNode >>> pure
+createElementNS ns name = document >>= Doc.createElementNS (Just ns) name >>= elementToNode >>> pure
 
 createTextNode :: ∀ e. String → Eff (dom :: DOM | e) Node
 createTextNode t = document >>= Doc.createTextNode t >>= textToNode >>> pure
@@ -44,10 +43,10 @@ childCount :: ∀ e. Node → Eff (dom :: DOM | e) Int
 childCount = Node.childNodes >=> NodeList.length
 
 childAt :: ∀ e. Int → Node → Eff (dom :: DOM | e) (Maybe Node)
-childAt index node = Node.childNodes node >>= NodeList.item index >>= toMaybe >>> pure
+childAt index node = Node.childNodes node >>= NodeList.item index
 
 nextSibling :: ∀ e. Node → Eff (dom :: DOM | e) (Maybe Node)
-nextSibling = Node.nextSibling >=> toMaybe >>> pure
+nextSibling = Node.nextSibling >=> pure
 
 setTextContent :: ∀ e. String → Node → Eff (dom :: DOM | e) Unit
 setTextContent = Node.setTextContent
